@@ -115,7 +115,7 @@ We describe below the expressions recognized by the standard.
 <term> ::= <aterm> 
          | <id> ":" <aterm> "->" <term>
 	 | (<binding> | <aterm>) "->" <term>
-	 | <id> (":" <aterm>)? "=>" <term>
+	 | <id> ":" <aterm> "=>" <term>
 
 <binding> ::= "(" <id ":" <term> ")"
 ```
@@ -146,17 +146,17 @@ will be made semantically.
 ```
 <visibility>     ::= "private"
 <definibility>   ::=  <visibility>? "injective" | "def"
-<type>           ::= ":" <term>
-<definition      ::= ":=" <term>
+<type>           ::= ":"  <term>
+<definition>     ::= ":=" <term>
 <command>        ::= <rules>
-	           | "def" <id> <binding>* <type>? <definition> 
+	           | "def" <id> <binding>* <type>  <definition>
 	           | "thm" <id> <binding>* <type>? <definition> 
 		   | <definibility>? <id> <type> 
 		   | "require" <mid>
 		   | "assert" <term> ":" <term>
 		   | "assert" <term> "=" <term>
 		   | "#" <pragma>
-<theory>	 ::= (<command> "." (<space>+ <command> ".")*)?
+<theory>	 ::= (<command> "." (<space> <command> ".")*)?
 ```
 
 The initial symbol for the grammar recognized by the Dedukti standard
@@ -176,3 +176,48 @@ ignored. For example:
 could be a pragma used to check whether `A` is a term that has type
 `Type`.
 
+
+# Semantics
+
+In this section, we describe how to check a theory.
+
+
+## Preprocessing
+
+To simplify the semantics, we perform a few
+equivalence-preserving preprocessing steps on the theory.
+
+### Bindings
+
+We eliminate bindings for commands starting with `def` and `thm`:
+if a type is given, we add bindings as dependent  products  to the type;
+if a term is given, we add bindings as lambda abstractions to the term.
+
+For example, a command of the shape
+`thm id (v1: ty1) ... (vn: tyn) : ty := tm`
+is replaced by the equivalent
+`thm <id> : v1 : ty1 -> ... -> vn : tyn -> ty := v1 : ty1 => ... => vn : tyn => tm`.
+
+### Definitions
+
+We replace commands of the shape `def id : ty := tm` by
+the sequence of the two commands
+`def id : ty` and
+`[] id --> tm`.
+
+### Jokers
+
+A command of the shape `[ctx] l --> r` introduces a rewrite rule with
+a context `ctx`, a left-hand side `l` and a right-hand side `r`.
+Any identifier `_` that occurs freely in the left-hand side of a rewrite rule
+is called a joker or wildcard.
+
+We eliminate all jokers from a rewrite rule as follows:
+While the left-hand side of a rule contains at least one joker, we
+replace that joker by a fresh variable and
+add the fresh variable to the context.
+For example, the rewrite rule
+`[x] f x _ _ --> g x` could be transformed to
+`[x, y, z] f x y z --> g x`, if `y` and `z` are fresh variables.
+
+We eliminate jokers from all rewrite rules.
