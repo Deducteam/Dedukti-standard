@@ -28,6 +28,7 @@ particular, nested comments are allowed such as:
 ### Spaces
 
 The token `<space>` is either one of the three following characters
+
 - `U+0020`: a space
 - `U+0009`: a tab (`\t`)
 - `U+000D`: a carriage return (`\r`)
@@ -60,10 +61,10 @@ Identifiers are used to represent variables and constant names.
 
 Identifiers `<id>` come into two variants:
 
-- simple identifiers `<sid>` are recognized by the regexp
+- simple identifiers `<sid>` are recognized by the regular expression
   `[a-zA-Z0-9_!?][a-zA-Z0-9_!?']*` but cannot be a `<keyword>`.
 
-- wrapped identifiers `<wid>` are recognized by the regexp
+- wrapped identifiers `<wid>` are recognized by the regular expression
   `{|<chr>*|}` such that `<chr>*` is any sequence of UTF-8 characters
   except `|}`.
 
@@ -71,25 +72,28 @@ Identifiers `<id>` come into two variants:
 <id> ::= <sid> | <wid>
 ```
 
-**Example:** `0baz` is a valid simple identifier. `{|😀|}` is a valid
-  wrapped identifier. But`😢`, or `def` are not valid identifiers.
+**Example:**
+  `0baz` is a valid simple identifier.
+  `{|Gödel's theorem|}` is a valid wrapped identifier.
+  But `Erdős`, or `def` are not valid identifiers.
 
 **Remark:** The identifiers `a` and `{|a|}` are different.
 
 ## Module identifiers
 
 Module identifiers are used to represent module names.
+A module identifier `<mid>` is recognized by the regular expression `[a-zA-Z0-9_]+`.
 
-- module identifier `<mid>` are recognized by the regexp `[a-zA-Z0-9_]+`
-
-**Example:** `0baz` is a valid module identifier, but `0baz?` is not a
-  valid module identifier. However `0baz?` is a valid identifier.
+**Example:**
+  `0baz` is a valid module identifier, but
+  `0baz?` is not a valid module identifier.
+  However, `0baz?` is a valid identifier.
 
 **Remark**: All module identifier are identifiers.
 
 ## Qualified identifiers
 
-The Dedukti standard recognized qualified identifiers which represent
+The Dedukti standard recognizes qualified identifiers which represent
 an identifier in a module. A qualified identifier `<qid>` is:
 
 ```
@@ -98,8 +102,9 @@ an identifier in a module. A qualified identifier `<qid>` is:
 
 There cannot be any space between the tokens that make up `<qid>`.
 
-**Example:** `A.b` is a valid qualified identifier while `A. b` is
-  not.
+**Example:**
+  `A.b` is a valid qualified identifier while
+  `A. b` is not.
 
 ## Expressions
 
@@ -114,8 +119,8 @@ We describe below the expressions recognized by the standard.
 
 <term> ::= <aterm> 
          | <id> ":" <aterm> "->" <term>
-	 | (<binding> | <aterm>) "->" <term>
-	 | <id> ":" <aterm> "=>" <term>
+         | (<binding> | <aterm>) "->" <term>
+         | <id> ":" <aterm> "=>" <term>
 
 <binding> ::= "(" <id ":" <term> ")"
 ```
@@ -144,19 +149,19 @@ will be made semantically.
 ## Theory
 
 ```
-<visibility>     ::= "private"
-<definibility>   ::=  <visibility>? "injective" | "def"
-<type>           ::= ":"  <term>
-<definition>     ::= ":=" <term>
-<command>        ::= <rules>
-	           | "def" <id> <binding>* <type>  <definition>
-	           | "thm" <id> <binding>* <type>? <definition> 
-		   | <definibility>? <id> <type> 
-		   | "require" <mid>
-		   | "assert" <term> ":" <term>
-		   | "assert" <term> "=" <term>
-		   | "#" <pragma>
-<theory>	 ::= (<command> "." (<space> <command> ".")*)?
+<visibility>   ::= "private"
+<definibility> ::=  <visibility>? "injective" | "def"
+<type>         ::= ":"  <term>
+<definition>   ::= ":=" <term>
+<command>      ::= <rules>
+                 | "def" <id> <binding>* <type>  <definition>
+                 | "thm" <id> <binding>* <type>? <definition>
+                 | <definibility>? <id> <type>
+                 | "require" <mid>
+                 | "assert" <term> ":" <term>
+                 | "assert" <term> "=" <term>
+                 | "#" <pragma>
+<theory>       ::= (<command> "." (<space> <command> ".")*)?
 ```
 
 The initial symbol for the grammar recognized by the Dedukti standard
