@@ -252,7 +252,10 @@ In this section, we describe how to check a theory.
 
 We now define the set of lambda-Pi terms that we will translate from our syntax to:
 
-A term $t$ is defined as $$t \coloneqq x \mid t\; t \mid \lambda x : t.\; t \mid \Pi x : t.\; t \mid (t) \mid \Type.$$
+A term $t$ is defined as $$t \coloneqq x \mid t\; t \mid \lambda x : t.\; t \mid \Pi x : t.\; t \mid (t) \mid s.$$
+A sort $s$ is defined as $\Type \mid \Kind$.
+
+TODO: Rename s to something else to avoid clash with sorts!
 
 We translate a term `t` as defined in the syntax section to a term $t$
 as defined in this section by $\|$`t`$\|$ as given below.
@@ -282,8 +285,26 @@ Product            |     `s -> u` | $\Pi     x: \|$`s`$\|. \|$`u`$\|$
 After having performed the preprocessing steps in the previous subsection,
 we have a sequence of simplified commands. We now describe how to check them.
 
-First, we initialise a global context $\Gamma$.
+First, we initialise a global context $\Gamma = \emptyset$.
+A global context $\Gamma$ contains statements of the shape
+$x : A$ or $l \hookrightarrow _\Delta r$.
 
 Then, we perform the following for every command `c`:
 
-TODO!
+* If `c` introduces a set of rewrite rules
+  `[ctx1] l1 --> r1 ... [ctxn] ln --> rn`:
+  We translate every rewrite rule to
+  $l \hookrightarrow _\Delta r$, and verify that
+  $\Gamma, \Delta \vdash ^r l \hookrightarrow r\; \mathrm{wf}$.
+  At the end, we add all the translated rewrite rules to $\Gamma$.
+* If `c` introduces a theorem by
+  `thm x : A := t`:
+  We verify that $x$ is not in $\Gamma$.
+  Furthermore, we translate `A` and `t`, and
+  verify that $\Gamma \vdash t : A$.
+  Finally, we add $x : A$ to $\Gamma$.
+* If $c$ introduces a new symbol by
+  `x : A`:
+  We verify that $x$ is not in $\Gamma$.
+  Then, we translate $A = \|$`A`$\|$ and
+  verify that $\Gamma \vdash A : s$.
