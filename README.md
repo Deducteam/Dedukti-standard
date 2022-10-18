@@ -36,7 +36,7 @@ The token `<space>` is either one of the three following characters
 
 or a `<comment>`.
 
-### Pragma
+### Pragmas
 
 The token `<pragma>` is defined as any sequence of UTF-8 characters
 that do not contain the token `<escape>`. The token `<escape>` is
@@ -125,35 +125,30 @@ We describe below the expressions recognized by the standard.
 <binding> ::= "(" <id ":" <term> ")"
 ```
 
-### Patterns
-
-Patterns are used for rewrite rules.
+### Rewrite rules
 
 ```
 <pattern> ::= <term>
+
+<rule_binding> ::= <id> (":" <term>)?
+
+<context> ::= <rule_binding> ("," <rule_binding>)*
+
+<rule> ::= "[" <context>? "]" <pattern> "-->" <term>
 ```
 
 In practice, not every term can be used as a pattern. The distinction
 will be made semantically.
 
-### Rewrite rule
 
-```
-<rule_binding> ::= <id> (":" <term>)?
-
-<rule_bindings> ::= <rule_binding> ("," <rule_binding>)*
-
-<rules> ::= ("[" <rule_bindings>? "]" <pattern> "-->" <term>)+ 
-```
-
-## Theory
+## Theories
 
 ```
 <visibility>   ::= "private"
 <definibility> ::=  <visibility>? "injective" | "def"
 <type>         ::= ":"  <term>
 <definition>   ::= ":=" <term>
-<command>      ::= <rules>
+<command>      ::= <rule>+
                  | "def" <id> <binding>* <type>  <definition>
                  | "thm" <id> <binding>* <type>? <definition>
                  | <definibility>? <id> <type>
@@ -182,17 +177,14 @@ could be a pragma used to check whether `A` is a term that has type
 `Type`.
 
 
-# Semantics
-
-In this section, we describe how to check a theory.
-
-
-## Preprocessing
+# Preprocessing
 
 To simplify the semantics, we perform a few
 equivalence-preserving preprocessing steps on the theory.
+The steps should be executed in the order
+in which they are introduced in this section.
 
-### Modules
+## Modules
 
 Each Dedukti theory file defines a *module*.
 A symbol `c` that was introduced in a module `m` can be referenced
@@ -215,7 +207,7 @@ To check a theory `m`, we check the demodulation of `m`.
   Then the demodulation of the module `nat` is the following:
   `basic.prop : Type. nat.nat : Type. nat.0 : nat.nat. nat.is_nat : nat.nat -> basic.prop`.
 
-### Bindings
+## Bindings
 
 We eliminate bindings for commands starting with `def` and `thm`:
 if a type is given, we add bindings as dependent  products  to the type;
@@ -227,14 +219,14 @@ if a term is given, we add bindings as lambda abstractions to the term.
   is replaced by the equivalent
   `thm <id> : v1 : ty1 -> ... -> vn : tyn -> ty := v1 : ty1 => ... => vn : tyn => tm`.
 
-### Definitions
+## Definitions
 
 We replace commands of the shape `def id : ty := tm` by
 the sequence of the two commands
 `def id : ty` and
 `[] id --> tm`.
 
-### Jokers
+## Jokers
 
 A command of the shape `[ctx] l --> r` introduces a rewrite rule with
 a context `ctx`, a left-hand side `l` and a right-hand side `r`.
@@ -250,3 +242,43 @@ For example, the rewrite rule
 `[x, y, z] f x y z --> g x`, if `y` and `z` are fresh variables.
 
 We eliminate jokers from all rewrite rules.
+
+
+# Semantics
+
+In this section, we describe how to check a theory.
+
+## Terms
+
+We now define the set of lambda-Pi terms that we will translate from our syntax to:
+
+A term $t$ is defined as $$t \coloneqq x \mid t\; t \mid \lambda x : t.\; t \mid \Pi x : t.\; t \mid (t) \mid Type.$$
+
+We translate a term `t` as defined in the syntax section to a term $t$
+as defined in this section by $\|$`t`$\|$ as given below.
+Here,
+`x` / $x$ stand for identifiers, and
+`s` / $x$ and `u` / $u$ stand for terms.
+
+Table: Term translation. In the "product" case, $x$ must be chosen to be fresh and not to appear freely in $\|$`u`$\|$.
+
+Case | `t` | $\|$`t`$\|$
+--- | --- | ----
+Parentheses | `(s)` | $(\|s\|)$
+Identifier | `x` | $x$
+Application | `s u` | $\|$`s`$\| \|$`u`$\|$
+Lambda abstraction | `x : s => u` | $\lambda x: \|$`s`$\|. \|$`u`$\|$
+Dependent product | `x : s -> u` | $\Pi     x: \|$`s`$\|. \|$`u`$\|$
+Product |     `s -> u` | $\Pi     x: \|$`s`$\|. \|$`u`$\|$
+
+
+## Checking
+
+After having performed the preprocessing steps in the previous subsection,
+we have a sequence of simplified commands. We now describe how to check them.
+
+First, we initialise a global context $\Gamma$.
+
+Then, we perform the following for every command `c`:
+
+TODO!
