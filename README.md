@@ -231,12 +231,12 @@ if a term is given, we add bindings as lambda abstractions to the term.
 
 ## Definitions / Theorems
 
-We replace commands of the shape `def id : ty := tm` by
-the sequence of the two commands
+We replace commands of the shape
+`def id : ty := tm` by the sequence of the two commands
 `def id : ty` and
 `[] id --> tm`.
-Furthermore, we replace commands of the shape `thm id : ty := tm` by
-the sequence of the two commands
+Furthermore, we replace commands of the shape
+`thm id : ty := tm` by the sequence of the two commands
 `id : ty` and
 `assert tm : ty`.
 
@@ -318,3 +318,5 @@ Then, we perform the following for every command `c`:
   verify that $\Gamma \vdash A : s$.
 * If `c` is an assertion of shape `assert t : A`,
   we verify that $\Gamma \vdash \|$`t`$\| : \|$`A`$\|$.
+* If `c` is an assertion of shape `assert t == A`,
+  we verify that $\|$`t`$\| \equiv _{\Gamma\beta} \|$`A`$\|$.
