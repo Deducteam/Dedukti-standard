@@ -135,8 +135,8 @@ We describe below the expressions recognized by the standard.
 <rule> ::= "[" <context>? "]" <pattern> "-->" <term>
 ```
 
-In practice, not every term can be used as a pattern. The distinction
-will be made semantically.
+In practice, not every term can be used as a pattern.
+The distinction will be made semantically.
 
 
 ## Theories
@@ -157,9 +157,8 @@ will be made semantically.
 <theory>       ::= (<command> "." (<space> <command> ".")*)?
 ```
 
-The initial symbol for the grammar recognized by the Dedukti standard
-is `<theory>`. By convention, the suffix of a file using this standard
-is "dk".
+The initial symbol for the grammar recognized by the Dedukti standard is `<theory>`.
+By convention, the suffix of a file using this standard is `.dk`.
 
 Pragma provide commands which are implementation dependent and do not
 need to be supported. This way, a file containing a pragma is
@@ -171,8 +170,7 @@ ignored. For example:
 #CHECK A : Type.
 ```
 
-could be a pragma used to check whether `A` is a term that has type
-`Type`.
+could be a pragma used to check whether `A` is a term that has type `Type`.
 
 
 # Preprocessing
@@ -267,25 +265,25 @@ We now define the set of lambda-Pi terms that we will translate from our syntax 
 A term $t$ is defined as $$t \coloneqq x \mid t\; t \mid \lambda x : t.\; t \mid \Pi x : t.\; t \mid (t) \mid s.$$
 A sort $s$ is defined as $\Type \mid \Kind$.
 
-TODO: Rename s to something else to avoid clash with sorts!
-
-We translate a term `t` as defined in the syntax section to a term $t$
-as defined in this section by $\|$`t`$\|$ as given below.
+We translate a term `t` as defined in the syntax section to
+a term $t$ as defined in this section by $\|$`t`$\|$ as given below.
 Here,
 `x` / $x$ stand for identifiers, and
-`s` / $x$ and `u` / $u$ stand for terms.
+`u` / $u$ and `v` / $v$ stand for terms.
+Additionally, in the "product" case,
+$x$ must be chosen to be fresh and not to appear freely in $\|$`v`$\|$.
 
-Table: Term translation. In the "product" case, $x$ must be chosen to be fresh and not to appear freely in $\|$`u`$\|$.
+Table: Term translation.
 
 Case               | `t`          | $\|$`t`$\|$
 ------------------ | ------------ | ---------------------------------
-Parentheses        | `(s)`        | $(\|s\|)$
+Parentheses        | `(u)`        | $(\|u\|)$
 Type               | `Type`       | $\Type$
 Identifier         | `x`          | $x$
-Application        | `s u`        | $\|$`s`$\| \|$`u`$\|$
-Lambda abstraction | `x : s => u` | $\lambda x: \|$`s`$\|. \|$`u`$\|$
-Dependent product  | `x : s -> u` | $\Pi     x: \|$`s`$\|. \|$`u`$\|$
-Product            |     `s -> u` | $\Pi     x: \|$`s`$\|. \|$`u`$\|$
+Application        | `u v`        | $\|$`u`$\| \|$`v`$\|$
+Lambda abstraction | `x : u => v` | $\lambda x: \|$`u`$\|. \|$`v`$\|$
+Dependent product  | `x : u -> v` | $\Pi     x: \|$`u`$\|. \|$`v`$\|$
+Product            |     `u -> v` | $\Pi     x: \|$`u`$\|. \|$`v`$\|$
 
 ## Rules
 
@@ -294,8 +292,8 @@ Product            |     `s -> u` | $\Pi     x: \|$`s`$\|. \|$`u`$\|$
 
 ## Checking
 
-After having performed the preprocessing steps in the previous subsection,
-we have a sequence of simplified commands. We now describe how to check them.
+The preprocessing steps in the previous subsection yield a sequence of simplified commands.
+We now describe how to check them.
 
 First, we initialise a global context $\Gamma = \emptyset$.
 A global context $\Gamma$ contains statements of the shape
@@ -304,13 +302,15 @@ $l \hookrightarrow _\Delta r$,
 $x\; \mathrm{injective}$, and
 $x\; \mathrm{definable}$.
 
-Then, we perform the following for every command `c`:
+Next, we perform the following for every command `c`:
 
 * If `c` introduces a set of rewrite rules
   `[ctx1] l1 --> r1 ... [ctxn] ln --> rn`:
   We translate every rewrite rule to
   $l \hookrightarrow _\Delta r$, and verify that
-  $\Gamma, \Delta \vdash ^r l \hookrightarrow r\; \mathrm{wf}$.
+  $\Gamma, \Delta \vdash ^r l \hookrightarrow r\; \mathrm{wf}$ and
+  $\Gamma \vdash h\;\mathrm{definable}$, where
+  $h$ is the head symbol of $l$.
   At the end, we add all the translated rewrite rules to $\Gamma$.
 * If $c$ introduces a new symbol by
   `x : A`,
