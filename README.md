@@ -205,7 +205,7 @@ if `c` is of the shape `require n`, then demodulate `n`, otherwise:
 2. Verify that for any constant `n.x` in `c` such that `n` $\neq$ `m`,
    `private` does not contain `n.x`.
 3. If `c` starts with the keyword `private` and declares `m.x`,
-   add `m.x` to the set `private`.
+   add `m.x` to the set `private` and remove the keyword `private` from `c`.
 4. Output `c`.
 
 To check a theory `m`, we check the demodulation of `m`.
@@ -301,7 +301,10 @@ we have a sequence of simplified commands. We now describe how to check them.
 
 First, we initialise a global context $\Gamma = \emptyset$.
 A global context $\Gamma$ contains statements of the shape
-$x : A$ or $l \hookrightarrow _\Delta r$.
+$x : A$,
+$l \hookrightarrow _\Delta r$,
+$x\; \mathrm{injective}$, and
+$x\; \mathrm{definable}$.
 
 Then, we perform the following for every command `c`:
 
@@ -312,11 +315,22 @@ Then, we perform the following for every command `c`:
   $\Gamma, \Delta \vdash ^r l \hookrightarrow r\; \mathrm{wf}$.
   At the end, we add all the translated rewrite rules to $\Gamma$.
 * If $c$ introduces a new symbol by
-  `x : A`:
-  We verify that $x$ is not in $\Gamma$.
-  Then, we translate $A = \|$`A`$\|$ and
-  verify that $\Gamma \vdash A : s$.
+  `x : A`,
+  we translate $A = \|$`A`$\|$,
+  we verify that $\Gamma \vdash A : s$ and $x$ is not in $\Gamma$,
+  and we add $x : A$ to $\Gamma$.
+* If `c` introduces a new definable symbol by
+  `def x : A`, then we perform the same as for `x : A`
+  before adding $x\; \mathrm{definable}$ to $\Gamma$.
+* If `c` introduces a new injective symbol by
+  `injective x : A`, then we perform the same as for `x : A`
+  before adding $x\; \mathrm{injective}$ to $\Gamma$.
+  It is up to the implementation to verify that
+  for all $\vec t$ and $\vec u$ of same length,
+  $x \vec t \equiv _{\Gamma\beta} x \vec u$ implies
+  $\vec t \equiv _{\Gamma\beta} \vec u$.
 * If `c` is an assertion of shape `assert t : A`,
   we verify that $\Gamma \vdash \|$`t`$\| : \|$`A`$\|$.
 * If `c` is an assertion of shape `assert t == A`,
   we verify that $\|$`t`$\| \equiv _{\Gamma\beta} \|$`A`$\|$.
+* If `c` is a pragma, the behaviour is up to the implementation.
