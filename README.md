@@ -189,14 +189,14 @@ in which they are introduced in this section.
 Each Dedukti theory file defines a *module*.
 A symbol `c` that was introduced in a module `m` can be referenced
 
-* inside  of module `m` by `c`, and
+* inside  of module `m` by `m.c` or `c`, and
 * outside of module `m` by `m.c`,
   provided that the command `require m` was encountered before.
 
 We can *demodulate* a module `m` as follows:
 For every command `c` in the file `m.dk`,
 if `c` is of the shape `require n`, then demodulate `n`; otherwise,
-output `c` where all constants in `c` are prefixed by `m`.
+output `c` where all non-qualified constants in `c` are prefixed by `m`.
 
 To check a theory `m`, we check the demodulation of `m`.
 
@@ -219,12 +219,16 @@ if a term is given, we add bindings as lambda abstractions to the term.
   is replaced by the equivalent
   `thm <id> : v1 : ty1 -> ... -> vn : tyn -> ty := v1 : ty1 => ... => vn : tyn => tm`.
 
-## Definitions
+## Definitions / Theorems
 
 We replace commands of the shape `def id : ty := tm` by
 the sequence of the two commands
 `def id : ty` and
 `[] id --> tm`.
+Furthermore, we replace commands of the shape `thm id : ty := tm` by
+the sequence of the two commands
+`id : ty` and
+`assert tm : ty`.
 
 ## Jokers
 
@@ -297,14 +301,10 @@ Then, we perform the following for every command `c`:
   $l \hookrightarrow _\Delta r$, and verify that
   $\Gamma, \Delta \vdash ^r l \hookrightarrow r\; \mathrm{wf}$.
   At the end, we add all the translated rewrite rules to $\Gamma$.
-* If `c` introduces a theorem by
-  `thm x : A := t`:
-  We verify that $x$ is not in $\Gamma$.
-  Furthermore, we translate `A` and `t`, and
-  verify that $\Gamma \vdash t : A$.
-  Finally, we add $x : A$ to $\Gamma$.
 * If $c$ introduces a new symbol by
   `x : A`:
   We verify that $x$ is not in $\Gamma$.
   Then, we translate $A = \|$`A`$\|$ and
   verify that $\Gamma \vdash A : s$.
+* If `c` is an assertion of shape `assert t : A`,
+  we verify that $\Gamma \vdash \|$`t`$\| : \|$`A`$\|$.
