@@ -130,9 +130,7 @@ We describe below the expressions recognized by the standard.
 ```
 <pattern> ::= <term>
 
-<rule_binding> ::= <id> (":" <term>)?
-
-<context> ::= <rule_binding> ("," <rule_binding>)*
+<context> ::= <id> ("," <id>)*
 
 <rule> ::= "[" <context>? "]" <pattern> "-->" <term>
 ```
