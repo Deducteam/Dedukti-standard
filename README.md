@@ -187,16 +187,26 @@ in which they are introduced in this section.
 ## Modules
 
 Each Dedukti theory file defines a *module*.
-A symbol `c` that was introduced in a module `m` can be referenced
+Any implementation of the standard must provide a way to
+associate to each module name `m` a unique filename `m.dk`.
+A symbol `x` that was introduced in a module `m` can be referenced
 
-* inside  of module `m` by `m.c` or `c`, and
-* outside of module `m` by `m.c`,
+* inside  of module `m` by `m.x` or `x`, and
+* outside of module `m` by `m.x`,
   provided that the command `require m` was encountered before.
+
+We globally keep a set `private` of qualified identifiers that is initially empty.
 
 We can *demodulate* a module `m` as follows:
 For every command `c` in the file `m.dk`,
-if `c` is of the shape `require n`, then demodulate `n`; otherwise,
-output `c` where all non-qualified constants in `c` are prefixed by `m`.
+if `c` is of the shape `require n`, then demodulate `n`, otherwise:
+
+1. Prefix all non-qualified constants in `c` with `m`.
+2. Verify that for any constant `n.x` in `c` such that `n` $\neq$ `m`,
+   `private` does not contain `n.x`.
+3. If `c` starts with the keyword `private` and declares `m.x`,
+   add `m.x` to the set `private`.
+4. Output `c`.
 
 To check a theory `m`, we check the demodulation of `m`.
 
