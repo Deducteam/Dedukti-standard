@@ -147,8 +147,8 @@ The distinction will be made semantically.
 <type>         ::= ":"  <term>
 <definition>   ::= ":=" <term>
 <command>      ::= <rule>+
-                 | "def" <id> <binding>* <type>  <definition>
-                 | "thm" <id> <binding>* <type>? <definition>
+                 | "def" <id> <binding>* <type> <definition>
+                 | "thm" <id> <binding>* <type> <definition>
                  | <definibility>? <id> <type>
                  | "require" <mid>
                  | "assert" <term> ":" <term>
@@ -192,6 +192,8 @@ A symbol `x` that was introduced in a module `m` can be referenced
   provided that the command `require m` was encountered before.
 
 We globally keep a set `private` of qualified identifiers that is initially empty.
+
+TODO: Make sure that no module is loaded more than once!
 
 We can *demodulate* a module `m` as follows:
 For every command `c` in the file `m.dk`,
