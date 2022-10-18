@@ -23,7 +23,7 @@
 
   \rrulepp{}{\jcw{\Gamma}}{\jct{\Gamma}{A}{s}}{\jcw{\Gamma,x : A}}
 
-  \rrulepp{}{\jcw{\Gamma}}{\jwr{\Gamma}{l \mrw{\Delta} r}}{\jcw{\Gamma, l \mrw{\Delta} r}}  
+  \rruleppp{}{\jcw{\Gamma}}{\jwr{\Gamma}{l \mrw{\Delta} r}}{\beta\Gamma \text{ is terminating and confluent}}{\jcw{\Gamma, l \mrw{\Delta} r}}  
 
   \rrulep{}{\jcw{\Gamma}}{\jct{\Gamma}{\Type}{\Kind}}
   
@@ -35,5 +35,5 @@
 
   \rrulepp{}{\jct{\Gamma}{t}{\tpi{x}{A}{B}}}{\jct{\Gamma}{u}{A}}{\jct{\Gamma}{\tapp{t}{u}}{\msubst{B}{x}{A}}}
 
-  \rruleppp{}{\jct{\Gamma}{t}{A}}{\jct{\Gamma}{B}{s}}{A \meq{\Gamma} B}{\jct{\Gamma}{t}{B}}
+  \rruleppp{}{\jct{\Gamma}{t}{A}}{\jct{\Gamma}{B}{s}}{A \meq{\beta\Gamma} B}{\jct{\Gamma}{t}{B}}
 \end{trules}
