@@ -1,0 +1,257 @@
+\usepackage{mdframed}
+\usepackage{mathpartir}
+\usepackage{framed}
+\usepackage{mathrsfs}
+
+%% define \mathcolor
+%%https://tex.stackexchange.com/questions/21598/how-to-color-math-symbols
+\makeatletter
+\def\mathcolor#1#{\@mathcolor{#1}}
+\def\@mathcolor#1#2#3{%
+  \protect\leavevmode
+  \begingroup
+    \color#1{#2}#3%
+  \endgroup
+}
+\makeatother
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%% Syntax
+
+% Syntax environment to declare syntax of typing systems. Should be used with \sline. It works as the itemize environment.
+% #1 is caption
+% #2 is label name
+\newenvironment{syntax}[2]
+{
+\def\mycaption{#1}
+\def\mylabel{#2}
+\begin{figure}
+    \begin{mdframed}
+      \begin{center}
+      \begin{tabular}{ccccl}
+}
+{
+\end{tabular}
+\end{center}
+\caption{\mycaption}
+\label{\mylabel}
+\end{mdframed}
+\end{figure}
+}
+
+% Use for each top level symbol.
+% #1 : name (eg: Contexts, Terms)
+% #2 : symbol (eg: m,n,A,B)
+% #3 : belong + set (eg: \in S, \in G)
+% #4 : definition symbol (eg: :=)
+% #5 : grammar definition (eg: x \mid s \ mid t~u)
+\newcommand{\sline}[5]{#1 & \ensuremath{#2} & \ensuremath{#3} & \ensuremath{#4} & \ensuremath{#5} \\}
+
+%%%%%%%%%%% derivations
+
+\newcommand{\toolnameref}[4]{
+  \expandafter\global\expandafter\def\csname rule#2\endcsname{\mtooltip{\ensuremath{#3}}{\ensuremath{#4}\hyperref[#1]{\(\uparrow\)}}}
+}
+
+
+%% Environment for typing systems
+% #1 : Caption name
+% #2 : Label name
+\newenvironment{trules}[2]
+{
+  \def\mycaption{#1}
+  \def\mylabel{#2}
+  \expandafter\global\expandafter\def\csname irname\endcsname{\toolnameref{#2}}
+  \begin{figure}
+    \begin{mdframed}
+      \begin{center}
+  \begin{mathpar}
+}
+{
+\end{mathpar}
+\end{center}
+\renewcommand{\figurename}{Figure}
+\caption{\mycaption}
+\label{\mylabel}
+\end{mdframed}
+\end{figure}
+}
+
+%% The \rrule[p*] macros allows to define new derivation rules. This aims to be used in and outstide the environment \trules
+
+%% New derivation rule with 0 premise
+% #1 : name of the rule
+% #2 : conclusion
+\newcommand{\rrule}[2]{
+\inferrule*[vcenter, right=\ensuremath{#1}]{ }
+{#2}
+}
+
+%% New derivation rule with 1 premise
+% #1 : name of the rule
+% #2 : 1st premise
+% #3 : conclusion
+\newcommand{\rrulep}[3]{
+\inferrule*[vcenter, right=\ensuremath{#1}]{#2}
+{#3}
+}
+
+%% New derivation rule with 2 premise
+% #1 : name of the rule
+% #2 : 1st premise
+% #3 : 2nd premise
+% #4 : conclusion
+\newcommand{\rrulepp}[4]{
+\inferrule*[vcenter, right=\ensuremath{#1}]{#2 \\ #3}
+{#4}
+}
+
+%% New derivation rule with 3 premise
+% #1 : name of the rule
+% #2 : 1st premise
+% #3 : 2nd premise
+% #4 : 3nd premise
+% #5 : conclusion
+\newcommand{\rruleppp}[5]{
+\inferrule*[vcenter, right=\ensuremath{#1}]{#2 \\ #3 \\ #4}
+{#5}
+}
+
+%% The \trule[p*] macros allows to define new derivation rules. This aims to be used ONLY in the environment \trules. With respect to the \r version, these macros takes a new parameter as their first argument which is the label to reference the rule. This rule can be referenced later with the \rref command.
+
+%% TODO: maybe declare a third version that could be use outside a trules environment
+
+\newcommand{\trule}[3]{
+  \expandafter\global\expandafter\def\csname tmpr#1\endcsname{\rrule{#2}{#3}}
+  \csname tmpr#1\endcsname
+  \irname{#1}{#2}{\ensuremath{\csname tmpr#1\endcsname}}
+}
+
+\newcommand{\trulep}[4]{
+  \expandafter\global\expandafter\def\csname tmpr#1\endcsname{\rrulep{#2}{#3}{#4}}
+  \csname tmpr#1\endcsname
+  \irname{#1}{#2}{\ensuremath{\csname tmpr#1\endcsname}}
+}
+
+\newcommand{\trulepp}[5]{
+  \expandafter\global\expandafter\def\csname tmpr#1\endcsname{\rrulepp{#2}{#3}{#4}{#5}}
+  \csname tmpr#1\endcsname
+  \irname{#1}{#2}{\ensuremath{\csname tmpr#1\endcsname}}
+}
+
+\newcommand{\truleppp}[6]{
+  \expandafter\global\expandafter\def\csname tmpr#1\endcsname{\rruleppp{#2}{#3}{#4}{#5}{#6}}
+  \csname tmpr#1\endcsname
+  \irname{#1}{#2}{\ensuremath{\csname tmpr#1\endcsname}}
+}
+
+
+%%%%%%%%%%% Lambda Terms
+
+%% Abstraction
+\newcommand{\tabs}[3]{\ensuremath{\lambda{#1}\,{:}\,{#2}.\,{#3}}}
+
+%% Untyped Abstraction
+\newcommand{\tabsU}[2]{\ensuremath{\lambda{#1}.\,{#2}}}
+
+%% Application
+\newcommand{\tapp}[2]{\ensuremath{{#1}~{#2}}}
+
+%% Simple product
+\newcommand{\tarr}[2]{\ensuremath{{#1}\rightarrow\, #2}}
+
+%% Dependent product
+\newcommand{\tpi}[3]{\ensuremath{({#1}\,{:}\,{#2})\rightarrow\,#3}}
+
+
+%%%%%%%%%%% Common symbols
+
+\newcommand{\seq}{\ensuremath{\equiv}}
+
+\newcommand{\srw}{\ensuremath{\hookrightarrow}}
+\newcommand{\ssrw}{\ensuremath{\hookleftarrow}}
+\newcommand{\sfv}{\ensuremath{\mathrm{FV}}}
+\newcommand{\swf}[0]{\ensuremath{\mathbf{wf}}}
+\newcommand{\sws}[0]{\ensuremath{\mathbf{ws}}}
+\newcommand{\swt}[0]{\ensuremath{\mathbf{wt}}}
+
+%%%%%%%%%%% Fonts
+
+\newcommand{\BN}{\ensuremath{\mathbb{N}}}
+\newcommand{\BO}{\ensuremath{\mathbb{O}}}
+\newcommand{\SC}{\ensuremath{\mathscr{C}}}
+\newcommand{\CC}{\ensuremath{\mathcal{C}}}
+
+
+%%%%%%%%%%% meta
+
+%% Substitution macro
+\newcommand{\msubst}[3]{\ensuremath{#1\left\{#2 \leftarrow #3\right\}}}
+
+%% Meta conversion
+% #1 : specify the generating relation
+\newcommand{\meq}[1]{\ensuremath{{\seq_{#1}}}}
+
+%% Meta rewriting
+\newcommand{\mrw}[1]{\ensuremath{\srw_{#1}}}
+
+%% Free variable
+\newcommand{\mfv}[1]{\ensuremath{\sfv(#1)}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%% Generic judgments definitions
+
+%% generic judgment for n-ary relations
+\newcommand{\jp}[5]{\ensuremath{#4 \mathcolor{#1}{\vdash_{#2}^{#3}} #5}}
+
+%% generic judgment for has-type relations
+% #1 is color
+% #2 is vdash subscript
+% #3 is vdash supperscript
+% #4 is type symbol (usually ":")
+% #5 is context
+% #6 is term
+% #7 is type
+\newcommand{\jht}[7]{\jp{#1}{#2}{#3}{#5}{#6 \mathcolor{#1}{#4} #7}}
+
+%% generic judgment for well-formed contexts
+% #1 is color
+% #2 is vdash subscript
+% #3 is vdash supperscript
+% #4 is context
+\newcommand{\jwt}[4]{\ensuremath{#4 \mathcolor{#1}{\vdash_{#2}^{#3}~\swf}}}
+
+%% generic judgment for well-formed types
+% #1 is color
+% #2 is vdash subscript
+% #3 is vdash supperscript
+% #4 is context
+\newcommand{\jws}[6]{\ensuremath{#4 \mathcolor{#1}{\vdash_{#2}^{#3}} #5\mathcolor{#1}{\overset{?}{:}}#6~\mathcolor{#1}{\sws}}}
+
+
+\newcommand{\jwf}[5]{\ensuremath{#4 \mathcolor{#1}{\vdash_{#2}^{#3}}#5~\mathcolor{#1}{\swf}}}
+
+\newcommand{\jwwt}[5]{\ensuremath{#4 \mathcolor{#1}{\vdash_{#2}^{#3}}#5~\mathcolor{#1}{\swt}}}
+
+
+%%%%% Classical CTS
+\newcommand{\jccw}[2]{\jwt{\clwtstyle}{#1}{}{#2}}
+\newcommand{\jccws}[4]{\jws{\clwststyle}{#1}{}{#2}{#3}{#4}}
+\newcommand{\jcw}[1]{\jccw{}{#1}}
+\newcommand{\jcws}[2]{\jccws{\SC}{#1}{#2}}
+\newcommand{\jcct}[4]{\jht{\clwtstyle}{#1}{}{:}{#2}{#3}{#4}}
+\newcommand{\jct}[3]{\jcct{}{#1}{#2}{#3}}
+
+\newcommand{\jce}{\mathcolor{\eqstyle}{\meqb}}
+
+%%%%%% Layered CTS
+\newcommand{\clwtstyle}{blue}
+\newcommand{\clhtstyle}{blue}
+
+\newcommand{\jwpat}[2]{\jwf{\clwtstyle}{}{p}{#1}{#2}}
+\newcommand{\jwr}[2]{\jwf{\clwtstyle}{}{r}{#1}{#2}}
+\newcommand{\jwtr}[2]{\jwwt{\clwtstyle}{}{r}{#1}{#2}}
+\newcommand{\jwpatpho}[2]{\jwf{\clwtstyle}{\SC}{p^{ho}}{#1}{#2}}

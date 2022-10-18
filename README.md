@@ -252,7 +252,7 @@ In this section, we describe how to check a theory.
 
 We now define the set of lambda-Pi terms that we will translate from our syntax to:
 
-A term $t$ is defined as $$t \coloneqq x \mid t\; t \mid \lambda x : t.\; t \mid \Pi x : t.\; t \mid (t) \mid Type.$$
+A term $t$ is defined as $$t \coloneqq x \mid t\; t \mid \lambda x : t.\; t \mid \Pi x : t.\; t \mid (t) \mid \Type.$$
 
 We translate a term `t` as defined in the syntax section to a term $t$
 as defined in this section by $\|$`t`$\|$ as given below.
@@ -265,11 +265,16 @@ Table: Term translation. In the "product" case, $x$ must be chosen to be fresh a
 Case               | `t`          | $\|$`t`$\|$
 ------------------ | ------------ | ---------------------------------
 Parentheses        | `(s)`        | $(\|s\|)$
+Type               | `Type`       | $\Type$
 Identifier         | `x`          | $x$
 Application        | `s u`        | $\|$`s`$\| \|$`u`$\|$
 Lambda abstraction | `x : s => u` | $\lambda x: \|$`s`$\|. \|$`u`$\|$
 Dependent product  | `x : s -> u` | $\Pi     x: \|$`s`$\|. \|$`u`$\|$
 Product            |     `s -> u` | $\Pi     x: \|$`s`$\|. \|$`u`$\|$
+
+## Rules
+
+\input{rules.tex}
 
 
 ## Checking

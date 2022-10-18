@@ -1,0 +1,39 @@
+\begin{trules}{Higher-Order Pattern}{coucou}
+  \trulep{a}{}{c \in \Gamma}{\jwpat{\Gamma;\Delta}{c}}
+
+  \trulepp{a}{}{\jwpat{\Gamma;\Delta}{t}}{\jwpatpho{\Gamma;\Delta;\emptyset}{u}}{\jwpat{\Gamma;\Delta}{\tapp{t}{u}}}
+ 
+  \trulep{a}{}{x \in \Gamma \cup \Xi}{\jwpatpho{\Gamma;\Delta;\Xi}{x}}
+  
+  \trulep{a}{}{\jwpatpho{\Gamma;\Delta;\Xi,x}{t}}{\jwpatpho{\Gamma;\Delta;\Xi}{\tabs{x}{A}{t}}}
+
+  \trulepp{a}{}{\jwpatpho{\Gamma;\Delta;\Xi}{t}}{\jwpatpho{\Gamma;\Delta;\Xi}{u}}{\jwpatpho{\Gamma;\Delta;\Xi}{\tapp{t}{u}}}
+
+  \trulepp{a}{}{F \in \Delta}{\forall x,y \in l, x \neq y \land x \in \Xi \land y \in \Xi}{\jwpatpho{\Gamma;\Delta;\Xi}{\tapp{F}{l}}}
+\end{trules}
+
+\begin{trules}{Rules}{coucouagain}
+  \trulep{a}{}{\forall \sigma : \Delta \to \mathcal{T}, \jct{\Gamma}{l\sigma}{A} \Rightarrow \jct{\Gamma}{r\sigma}{A} }{\jwtr{\Gamma}{l \mrw{\Delta} r}}
+  
+  \truleppp{a}{}{\jwpat{\Gamma;\Delta}{l}}{FV(r) \subseteq FV(l) = \Delta}{\jwtr{\Gamma}{l \mrw{\Delta} r}}{\jwr{\Gamma}{l \mrw{\Delta} r}}
+\end{trules}
+
+\begin{trules}{Typing system}{oopsi}
+  \trule{a}{}{\jcw{\emptyset}}
+
+  \trulepp{a}{}{\jcw{\Gamma}}{\jct{\Gamma}{A}{s}}{\jcw{\Gamma,x : A}}
+
+  \trulepp{a}{}{\jcw{\Gamma}}{\jwr{\Gamma}{l \mrw{\Delta} r}}{\jcw{\Gamma, l \mrw{\Delta} r}}  
+
+  \trulep{a}{}{\jcw{\Gamma}}{\jct{\Gamma}{\Type}{\Kind}}
+  
+  \trulepp{a}{}{\jcw{\Gamma}}{x \in \Gamma}{\jct{\Gamma}{x}{A}}
+
+  \trulepp{a}{}{\jct{\Gamma}{A}{\Type}}{\jct{\Gamma,x:A}{B}{s}}{\jct{\Gamma}{\tpi{x}{A}{B}}{s}}
+  
+  \trulepp{a}{}{\jct{\Gamma,x:A}{t}{B}}{\jct{\Gamma}{\tpi{x}{A}{B}}{s}}{\jct{\Gamma}{\tabs{x}{A}{t}}{\tpi{x}{A}{B}}}
+
+  \trulepp{a}{}{\jct{\Gamma}{t}{\tpi{x}{A}{B}}}{\jct{\Gamma}{u}{A}}{\jct{\Gamma}{\tapp{t}{u}}{\msubst{B}{x}{A}}}
+
+  \truleppp{a}{}{\jct{\Gamma}{t}{A}}{\jct{\Gamma}{B}{s}}{A \meq{\Gamma} B}{\jct{\Gamma}{t}{B}}
+\end{trules}
