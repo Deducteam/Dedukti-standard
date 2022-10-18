@@ -262,14 +262,14 @@ Here,
 
 Table: Term translation. In the "product" case, $x$ must be chosen to be fresh and not to appear freely in $\|$`u`$\|$.
 
-Case | `t` | $\|$`t`$\|$
---- | --- | ----
-Parentheses | `(s)` | $(\|s\|)$
-Identifier | `x` | $x$
-Application | `s u` | $\|$`s`$\| \|$`u`$\|$
+Case               | `t`          | $\|$`t`$\|$
+------------------ | ------------ | ---------------------------------
+Parentheses        | `(s)`        | $(\|s\|)$
+Identifier         | `x`          | $x$
+Application        | `s u`        | $\|$`s`$\| \|$`u`$\|$
 Lambda abstraction | `x : s => u` | $\lambda x: \|$`s`$\|. \|$`u`$\|$
-Dependent product | `x : s -> u` | $\Pi     x: \|$`s`$\|. \|$`u`$\|$
-Product |     `s -> u` | $\Pi     x: \|$`s`$\|. \|$`u`$\|$
+Dependent product  | `x : s -> u` | $\Pi     x: \|$`s`$\|. \|$`u`$\|$
+Product            |     `s -> u` | $\Pi     x: \|$`s`$\|. \|$`u`$\|$
 
 
 ## Checking
