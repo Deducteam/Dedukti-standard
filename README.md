@@ -192,16 +192,40 @@ In this section, we describe how to check a theory.
 To simplify the semantics, we perform a few
 equivalence-preserving preprocessing steps on the theory.
 
+### Modules
+
+Each Dedukti theory file defines a *module*.
+A symbol `c` that was introduced in a module `m` can be referenced
+
+* inside  of module `m` by `c`, and
+* outside of module `m` by `m.c`,
+  provided that the command `require m` was encountered before.
+
+We can *demodulate* a module `m` as follows:
+For every command `c` in the file `m.dk`,
+if `c` is of the shape `require n`, then demodulate `n`; otherwise,
+output `c` where all constants in `c` are prefixed by `m`.
+
+To check a theory `m`, we check the demodulation of `m`.
+
+**Example:**
+  Suppose we have two theory files `basic.dk` and `nat.dk`, where
+  `basic.dk` contains `prop : Type.` and
+  `nat.dk` contains `nat : Type. 0 : nat. require prop. is_nat : nat -> prop.`.
+  Then the demodulation of the module `nat` is the following:
+  `basic.prop : Type. nat.nat : Type. nat.0 : nat.nat. nat.is_nat : nat.nat -> basic.prop`.
+
 ### Bindings
 
 We eliminate bindings for commands starting with `def` and `thm`:
 if a type is given, we add bindings as dependent  products  to the type;
 if a term is given, we add bindings as lambda abstractions to the term.
 
-For example, a command of the shape
-`thm id (v1: ty1) ... (vn: tyn) : ty := tm`
-is replaced by the equivalent
-`thm <id> : v1 : ty1 -> ... -> vn : tyn -> ty := v1 : ty1 => ... => vn : tyn => tm`.
+**Example:**
+  A command of the shape
+  `thm id (v1: ty1) ... (vn: tyn) : ty := tm`
+  is replaced by the equivalent
+  `thm <id> : v1 : ty1 -> ... -> vn : tyn -> ty := v1 : ty1 => ... => vn : tyn => tm`.
 
 ### Definitions
 
