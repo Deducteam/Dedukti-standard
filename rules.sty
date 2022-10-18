@@ -18,44 +18,6 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%% Syntax
-
-% Syntax environment to declare syntax of typing systems. Should be used with \sline. It works as the itemize environment.
-% #1 is caption
-% #2 is label name
-\newenvironment{syntax}[2]
-{
-\def\mycaption{#1}
-\def\mylabel{#2}
-\begin{figure}
-    \begin{mdframed}
-      \begin{center}
-      \begin{tabular}{ccccl}
-}
-{
-\end{tabular}
-\end{center}
-\caption{\mycaption}
-\label{\mylabel}
-\end{mdframed}
-\end{figure}
-}
-
-% Use for each top level symbol.
-% #1 : name (eg: Contexts, Terms)
-% #2 : symbol (eg: m,n,A,B)
-% #3 : belong + set (eg: \in S, \in G)
-% #4 : definition symbol (eg: :=)
-% #5 : grammar definition (eg: x \mid s \ mid t~u)
-\newcommand{\sline}[5]{#1 & \ensuremath{#2} & \ensuremath{#3} & \ensuremath{#4} & \ensuremath{#5} \\}
-
-%%%%%%%%%%% derivations
-
-\newcommand{\toolnameref}[4]{
-  \expandafter\global\expandafter\def\csname rule#2\endcsname{\mtooltip{\ensuremath{#3}}{\ensuremath{#4}\hyperref[#1]{\(\uparrow\)}}}
-}
-
-
 %% Environment for typing systems
 % #1 : Caption name
 % #2 : Label name
@@ -63,7 +25,6 @@
 {
   \def\mycaption{#1}
   \def\mylabel{#2}
-  \expandafter\global\expandafter\def\csname irname\endcsname{\toolnameref{#2}}
   \begin{figure}
     \begin{mdframed}
       \begin{center}
@@ -118,35 +79,6 @@
 \inferrule*[vcenter, right=\ensuremath{#1}]{#2 \\ #3 \\ #4}
 {#5}
 }
-
-%% The \trule[p*] macros allows to define new derivation rules. This aims to be used ONLY in the environment \trules. With respect to the \r version, these macros takes a new parameter as their first argument which is the label to reference the rule. This rule can be referenced later with the \rref command.
-
-%% TODO: maybe declare a third version that could be use outside a trules environment
-
-\newcommand{\trule}[3]{
-  \expandafter\global\expandafter\def\csname tmpr#1\endcsname{\rrule{#2}{#3}}
-  \csname tmpr#1\endcsname
-  \irname{#1}{#2}{\ensuremath{\csname tmpr#1\endcsname}}
-}
-
-\newcommand{\trulep}[4]{
-  \expandafter\global\expandafter\def\csname tmpr#1\endcsname{\rrulep{#2}{#3}{#4}}
-  \csname tmpr#1\endcsname
-  \irname{#1}{#2}{\ensuremath{\csname tmpr#1\endcsname}}
-}
-
-\newcommand{\trulepp}[5]{
-  \expandafter\global\expandafter\def\csname tmpr#1\endcsname{\rrulepp{#2}{#3}{#4}{#5}}
-  \csname tmpr#1\endcsname
-  \irname{#1}{#2}{\ensuremath{\csname tmpr#1\endcsname}}
-}
-
-\newcommand{\truleppp}[6]{
-  \expandafter\global\expandafter\def\csname tmpr#1\endcsname{\rruleppp{#2}{#3}{#4}{#5}{#6}}
-  \csname tmpr#1\endcsname
-  \irname{#1}{#2}{\ensuremath{\csname tmpr#1\endcsname}}
-}
-
 
 %%%%%%%%%%% Lambda Terms
 
