@@ -3,8 +3,8 @@ all: README.pdf
 clean:
 	rm README.pdf
 
-%.tex: %.md
-	pandoc $< -s -o $@
+%.tex: %.md header.tex
+	pandoc $< -s -o $@ -H header.tex
 
 %.pdf: %.tex
 	pdflatex $<
