@@ -335,7 +335,7 @@ TODO: Add a new rule that checks termination and confluence for *sets* of rewrit
 
 ## Checking
 
-The preprocessing steps in the previous subsection yield a sequence of simplified commands.
+The [preprocessing steps](#preprocessing) yield a sequence of simplified commands.
 We now describe how to check them.
 
 First, we initialise a global context $\Gamma = \emptyset$.
