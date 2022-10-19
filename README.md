@@ -79,7 +79,7 @@ Identifiers `<id>` come into two variants:
 
 **Remark:** The identifiers `a` and `{|a|}` are different.
 
-## Module identifiers
+### Module identifiers
 
 Module identifiers are used to represent module names.
 A module identifier `<mid>` is recognized by the regular expression `[a-zA-Z0-9_]+`.
@@ -91,7 +91,7 @@ A module identifier `<mid>` is recognized by the regular expression `[a-zA-Z0-9_
 
 **Remark**: All module identifier are identifiers.
 
-## Qualified identifiers
+### Qualified identifiers
 
 The Dedukti standard recognizes qualified identifiers which represent
 an identifier in a module. A qualified identifier `<qid>` is:
@@ -106,11 +106,7 @@ There cannot be any space between the tokens that make up `<qid>`.
   `A.b` is a valid qualified identifier while
   `A. b` is not.
 
-## Expressions
-
-We describe below the expressions recognized by the standard.
-
-### Terms
+## Terms {#dk-terms}
 
 ```
 <sterm> ::= <qid> | <id> | "(" <term> ")" | "Type"
@@ -137,7 +133,7 @@ We describe below the expressions recognized by the standard.
   whereas when checking that a rewrite rule $l \hookrightarrow _\Delta r$ is well-typed,
   the standard covers only the case that $l$ is lambda-untyped and $r$ is lambda-typed.
 
-### Rewrite rules
+## Rewrite rules
 
 ```
 <pattern> ::= <term>
@@ -202,6 +198,8 @@ A symbol `x` that was introduced in a module `m` can be referenced
 * inside  of module `m` by `m.x` or `x`, and
 * outside of module `m` by `m.x`,
   provided that the command `require m` was encountered before.
+
+TODO: motivation behind demodulation
 
 We globally keep a set `private` of qualified identifiers that is initially empty.
 
@@ -289,7 +287,7 @@ In this section, we describe how to check a theory.
 
 ## Terms
 
-We now define the set of lambda-Pi terms that we will translate from our syntax to:
+We define the set of lambda-Pi terms that we will translate from our syntax to:
 
 A term $t$ is defined as
 $$t \coloneqq
@@ -302,7 +300,7 @@ t\; t \mid
 s.$$
 A sort $s$ is defined as $\Type \mid \Kind$.
 
-We translate a term `t` as defined in the syntax section to
+We translate a term `t` as defined in [the syntax section](#dk-terms) to
 a term $t$ as defined in this section by $\|$`t`$\|$ as given below.
 Here,
 `x` / $x$ stand for identifiers, and
