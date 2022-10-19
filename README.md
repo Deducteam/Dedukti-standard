@@ -291,7 +291,15 @@ In this section, we describe how to check a theory.
 
 We now define the set of lambda-Pi terms that we will translate from our syntax to:
 
-A term $t$ is defined as $$t \coloneqq x \mid t\; t \mid \lambda x : t.\; t \mid \Pi x : t.\; t \mid (t) \mid s.$$
+A term $t$ is defined as
+$$t \coloneqq
+x \mid
+t\; t \mid
+\lambda x.\; t \mid
+\lambda x : t.\; t \mid
+\Pi x : t.\; t \mid
+(t) \mid
+s.$$
 A sort $s$ is defined as $\Type \mid \Kind$.
 
 We translate a term `t` as defined in the syntax section to
@@ -299,7 +307,7 @@ a term $t$ as defined in this section by $\|$`t`$\|$ as given below.
 Here,
 `x` / $x$ stand for identifiers, and
 `u` / $u$ and `v` / $v$ stand for terms.
-Additionally, in the "product" case,
+Additionally, in the (non-dependent) "product" case,
 $x$ must be chosen to be fresh and not to appear freely in $\|$`v`$\|$.
 
 Table: Term translation.
