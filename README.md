@@ -1,14 +1,14 @@
 # Dedukti standard
 
-This document aims to specify the version 1.0 of the Dedukti
-standard. This standard aims to document a language based upon the
+This document aims to specify the version 1.0 of the Dedukti standard.
+This standard aims to document a language based upon the
 Lambda-Pi Calculus Modulo Theory.
+
+# Syntax
 
 Any file that represents Dedukti standard character can be encoded
 using UTF-8. Any UTF-8 character will be written using the syntax
 `U+xxxx`. For example, `U+0061` represents the character `A`.
-
-# Syntax
 
 ## Lexicon 
 
@@ -120,10 +120,22 @@ We describe below the expressions recognized by the standard.
 <term> ::= <aterm> 
          | <id> ":" <aterm> "->" <term>
          | (<binding> | <aterm>) "->" <term>
-         | <id> ":" <aterm> "=>" <term>
+         | <id> (":" <aterm>)? "=>" <term>
 
 <binding> ::= "(" <id ":" <term> ")"
 ```
+
+**Remark:**
+  The syntax allows to write lambda abstractions where
+  the type of the variable may or may not be given.
+  We call a term $t$ *lambda-typed* when
+  a type is given for all variables of all lambda abstractions in $t$, and
+  we call a term *lambda-untyped* when
+  no type is given for all variables of all lambda abstractions in $t$.
+  Later on, when checking that a term $t$ is of type $A$,
+  the standard covers only the case that $t$ and $A$ are lambda-typed,
+  whereas when checking that a rewrite rule $l \hookrightarrow _\Delta r$ is well-typed,
+  the standard covers only the case that $l$ is lambda-untyped and $r$ is lambda-typed.
 
 ### Rewrite rules
 
@@ -193,8 +205,6 @@ A symbol `x` that was introduced in a module `m` can be referenced
 
 We globally keep a set `private` of qualified identifiers that is initially empty.
 
-TODO: Make sure that no module is loaded more than once!
-
 We can *demodulate* a module `m` as follows:
 For every command `c` in the file `m.dk`,
 if `c` is of the shape `require n`, then demodulate `n`, otherwise:
@@ -214,6 +224,23 @@ To check a theory `m`, we check the demodulation of `m`.
   `nat.dk` contains `nat : Type. 0 : nat. require prop. is_nat : nat -> prop.`.
   Then the demodulation of the module `nat` is the following:
   `basic.prop : Type. nat.nat : Type. nat.0 : nat.nat. nat.is_nat : nat.nat -> basic.prop`.
+
+When a theory `a` requires `b` and `b` requires `a`, then we have a loop.
+When a theory `a` requires `b` and `c`, and both `b` and `c` require `d`,
+then we have a duplicate requirement.
+The demodulation procedure shown above
+does not detect loops and
+inserts duplicate requirements multiple times.
+In order to prevent both, we can augment the demodulation procedure as follows:
+We introduce two global sets that are initially empty:
+`open` contains the names of modules that are currently being demodulated, and
+`closed` contains the names of modules that have been completely demodulated.
+At the start of the demodulation of `m`,
+we fail if `m` is in `open` (to prevent loops), and
+we return if `m` is in `closed` (to prevent inserting `m` twice).
+Then we add `m` to `open`.
+At the end of the demodulation of `m`,
+we move `m` from `open` to `closed`.
 
 ## Bindings
 
