@@ -318,6 +318,20 @@ Product            |     `u -> v` | $\Pi     x: \|$`u`$\|. \|$`v`$\|$
 
 \input{rules.tex}
 
+It can be necessary to introduce sets of rewrite rules where
+subsets of the rules are not terminating and confluent,
+but the whole set is.
+Consider the rewrite rules
+$a \hookrightarrow b$,
+$a \hookrightarrow c$,
+$b \hookrightarrow d$, and
+$c \hookrightarrow d$.
+The four rules together are terminating and confluent,
+but when omitting either the third or the fourth rule,
+the set is not confluent.
+
+TODO: Add a new rule that checks termination and confluence for *sets* of rewrite rules, not for individual rules!
+
 
 ## Checking
 
