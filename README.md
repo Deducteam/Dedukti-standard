@@ -184,61 +184,9 @@ could be a pragma used to check whether `A` is a term that has type `Type`.
 # Preprocessing
 
 To simplify the semantics, we perform a few
-equivalence-preserving preprocessing steps on the theory.
+equivalence-preserving preprocessing steps on commands.
 The steps should be executed in the order
 in which they are introduced in this section.
-
-## Modules
-
-Each Dedukti theory file defines a *module*.
-Any implementation of the standard must provide a way to
-associate to each module name `m` a unique filename `m.dk`.
-A symbol `x` that was introduced in a module `m` can be referenced
-
-* inside  of module `m` by `m.x` or `x`, and
-* outside of module `m` by `m.x`,
-  provided that the command `require m` was encountered before.
-
-TODO: motivation behind demodulation
-
-We globally keep a set `private` of qualified identifiers that is initially empty.
-
-We can *demodulate* a module `m` as follows:
-For every command `c` in the file `m.dk`,
-if `c` is of the shape `require n`, then demodulate `n`, otherwise:
-
-1. Prefix all non-qualified constants in `c` with `m`.
-2. Verify that for any constant `n.x` in `c` such that `n` $\neq$ `m`,
-   `private` does not contain `n.x`.
-3. If `c` starts with the keyword `private` and declares `m.x`,
-   add `m.x` to the set `private` and remove the keyword `private` from `c`.
-4. Output `c`.
-
-To check a theory `m`, we check the demodulation of `m`.
-
-**Example:**
-  Suppose we have two theory files `basic.dk` and `nat.dk`, where
-  `basic.dk` contains `prop : Type.` and
-  `nat.dk` contains `nat : Type. 0 : nat. require prop. is_nat : nat -> prop.`.
-  Then the demodulation of the module `nat` is the following:
-  `basic.prop : Type. nat.nat : Type. nat.0 : nat.nat. nat.is_nat : nat.nat -> basic.prop`.
-
-When a theory `a` requires `b` and `b` requires `a`, then we have a loop.
-When a theory `a` requires `b` and `c`, and both `b` and `c` require `d`,
-then we have a duplicate requirement.
-The demodulation procedure shown above
-does not detect loops and
-inserts duplicate requirements multiple times.
-In order to prevent both, we can augment the demodulation procedure as follows:
-We introduce two global sets that are initially empty:
-`open` contains the names of modules that are currently being demodulated, and
-`closed` contains the names of modules that have been completely demodulated.
-At the start of the demodulation of `m`,
-we fail if `m` is in `open` (to prevent loops), and
-we return if `m` is in `closed` (to prevent inserting `m` twice).
-Then we add `m` to `open`.
-At the end of the demodulation of `m`,
-we move `m` from `open` to `closed`.
 
 ## Bindings
 
@@ -338,27 +286,72 @@ the set is not confluent.
 
 TODO: Add a new rule that checks termination and confluence for *sets* of rewrite rules, not for individual rules!
 
+## Modules
+
+Each Dedukti theory file defines a *module*.
+Any implementation of the standard must provide a way to
+associate to each module name `m` a unique filename `m.dk`.
+A symbol `x` that was introduced in a module `m` can be referenced
+
+* inside  of module `m` by `m.x` or `x`, and
+* outside of module `m` by `m.x`,
+  provided that the command `require m` was encountered in the current theory before.
+
 
 ## Checking
 
-The [preprocessing steps](#preprocessing) yield a sequence of simplified commands.
-We now describe how to check them.
+First, we initialise a few global variables:
 
-First, we initialise a global context $\Gamma = \emptyset$.
-A global context $\Gamma$ contains statements of the shape
-$x : A$,
-$l \hookrightarrow _\Delta r$,
-$x\; \mathrm{injective}$, and
-$x\; \mathrm{definable}$.
+* $\Gamma$:
+  A global context $\Gamma$ contains statements of the shape
+  $x : A$ and
+  $l \hookrightarrow _\Delta r$.
+* `open` (set of module names):
+  When a theory `a` requires `b` and `b` requires `a`,
+  then we should detect an infinite loop.
+  For this, we insert `a` into `open` when we start checking it and
+  remove it from `open` only once we have finished checking it.
+  This allows us to conclude an infinite loop when
+  upon checking `a`, `a` is already in `open`.
+* `checked` (set of module names):
+  When a theory `a` requires `b` and `c`, and both `b` and `c` require `d`,
+  then checking `a` should only check `d` once.
+  For this, we insert `d` into `checked` once it has been checked,
+  in order to prevent `d` to be checked a second time.
+* `private`,
+  `definable`, and
+  `injective` (sets of quantified identifiers).
 
-Next, we perform the following for every command `c`:
+All these sets are initially empty.
 
+To check a module `m`, we perform the following.
+
+If `m` is in `open`, we fail, otherwise we add `m` to `open`.
+If `m` is in `checked`, we are done checking `m`.
+
+We initialise a local variable `required`, which stores
+the set of modules from which the current module may access symbols.
+This is a local and not a global variable for the following reason:
+If we have a module `a` depending on `b` and `b` depending on `c`,
+then `a` should not automatically have access to symbols from `c`,
+because if `b` stops depending on `c`, `a` should still check successfully.
+In other words, `require` is not transitive.
+
+For every command `c` in the module `m`, we first
+prefix all non-qualified constants in `c` with `m`, then
+verify that for any constant `n.x` in `c`, if `n` $\neq$ `m`, then
+`required` must contain `n` and
+`private`  must not contain `n.x`.
+Then, we [preprocess](#preprocessing) `c`, then perform the following:
+
+* If `c` declares a dependency on a module by `require m`,
+  we add `m` to `required` and check `m`.
 * If `c` introduces a set of rewrite rules
   `[ctx1] l1 --> r1 ... [ctxn] ln --> rn`:
   We translate every rewrite rule to
   $l \hookrightarrow _\Delta r$, and verify that
   $\Gamma, \Delta \vdash ^r l \hookrightarrow r\; \mathrm{wf}$ and
-  $\Gamma \vdash h\;\mathrm{definable}$, where
+  $h$ is in `definable`, where
   $h$ is the head symbol of $l$.
   At the end, we add all the translated rewrite rules to $\Gamma$.
 * If $c$ introduces a new symbol by
@@ -366,12 +359,15 @@ Next, we perform the following for every command `c`:
   we translate $A = \|$`A`$\|$,
   we verify that $\Gamma \vdash A : s$ and $x$ is not in $\Gamma$,
   and we add $x : A$ to $\Gamma$.
+. If `c` introduces a new private symbol by
+  `private x : A`, then we perform the same as for `x : A`
+  before adding $x$ to `private`.
 * If `c` introduces a new definable symbol by
   `def x : A`, then we perform the same as for `x : A`
-  before adding $x\; \mathrm{definable}$ to $\Gamma$.
+  before adding $x$ to `definable`.
 * If `c` introduces a new injective symbol by
   `injective x : A`, then we perform the same as for `x : A`
-  before adding $x\; \mathrm{injective}$ to $\Gamma$.
+  before adding $x$ to `injective`.
   It is up to the implementation to verify that
   for all $\vec t$ and $\vec u$ of same length,
   $x \vec t \equiv _{\Gamma\beta} x \vec u$ implies
@@ -381,3 +377,5 @@ Next, we perform the following for every command `c`:
 * If `c` is an assertion of shape `assert t == A`,
   we verify that $\|$`t`$\| \equiv _{\Gamma\beta} \|$`A`$\|$.
 * If `c` is a pragma, the behaviour is up to the implementation.
+
+Finally, we add `m` to `checked` and remove `m` from `open`.
