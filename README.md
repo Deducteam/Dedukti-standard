@@ -118,7 +118,7 @@ There cannot be any space between the tokens that make up `<qid>`.
          | (<binding> | <aterm>) "->" <term>
          | <id> (":" <aterm>)? "=>" <term>
 
-<binding> ::= "(" <id ":" <term> ")"
+<binding> ::= "(" <id> ":" <term> ")"
 ```
 
 **Remark:**
