@@ -151,13 +151,13 @@ The distinction will be made semantically.
 
 ```
 <visibility>   ::= "private"
-<definibility> ::=  <visibility>? "injective" | "def"
+<definability> ::=  <visibility>? "injective" | "def"
 <type>         ::= ":"  <term>
 <definition>   ::= ":=" <term>
 <command>      ::= <rule>+
                  | "def" <id> <binding>* <type> <definition>
                  | "thm" <id> <binding>* <type> <definition>
-                 | <definibility>? <id> <type>
+                 | <definability>? <id> <type>
                  | "require" <mid>
                  | "assert" <term> ":" <term>
                  | "assert" <term> "=" <term>
