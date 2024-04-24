@@ -150,12 +150,10 @@ The distinction will be made semantically.
 ## Theories
 
 ```
-<definability> ::= ("private"? "injective") | "def"
 <sig>          ::= <id> <binding>* ":" <term>
-<definition>   ::= ":=" <term>
 <command>      ::= <rule>+
-                 | ("def" | "thm") <sig> <definition>
-                 | <definability>? <sig>
+                 | ("def" | "thm") <sig> ":=" <term>
+                 | ("def" | ("private"? "injective"))? <sig>
                  | "require" <mid>
                  | "assert" <term> ":" <term>
                  | "assert" <term> "=" <term>
