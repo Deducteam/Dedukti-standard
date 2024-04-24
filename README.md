@@ -150,14 +150,12 @@ The distinction will be made semantically.
 ## Theories
 
 ```
-<visibility>   ::= "private"
-<definability> ::=  <visibility>? "injective" | "def"
-<type>         ::= ":"  <term>
+<definability> ::= ("private"? "injective") | "def"
+<sig>          ::= <id> <binding>* ":" <term>
 <definition>   ::= ":=" <term>
 <command>      ::= <rule>+
-                 | "def" <id> <binding>* <type> <definition>
-                 | "thm" <id> <binding>* <type> <definition>
-                 | <definability>? <id> <type>
+                 | ("def" | "thm") <sig> <definition>
+                 | <definability>? <sig>
                  | "require" <mid>
                  | "assert" <term> ":" <term>
                  | "assert" <term> "=" <term>
@@ -190,7 +188,8 @@ in which they are introduced in this section.
 
 ## Bindings
 
-We eliminate bindings for commands starting with `def` and `thm`:
+We eliminate bindings for commands that introduce symbols
+(e.g. commands starting with `def`, `thm`, or `injective`):
 if a type is given, we add bindings as dependent  products  to the type;
 if a term is given, we add bindings as lambda abstractions to the term.
 
